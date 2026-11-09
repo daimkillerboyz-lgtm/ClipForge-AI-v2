@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>ClipForge AI – Turn long videos into short clips</title>
+<meta name="theme-color" content="#07060f">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<div class="glow" aria-hidden="true"></div>
+<div class="app">
+
+<!-- Navigation: sidebar on desktop, bottom bar on mobile -->
+<nav class="nav" aria-label="Main">
+  <div class="brand"><span class="logo">C</span><b>ClipForge AI</b></div>
+  <button class="nav-btn active" data-view="home">Dashboard</button>
+  <button class="nav-btn" data-view="project">New project</button>
+  <button class="nav-btn" data-view="editor">Editor</button>
+  <button class="nav-btn" data-view="export">Export</button>
+  <button class="nav-btn" data-view="settings">Settings</button>
+</nav>
+
+<main>
+<!-- DASHBOARD -->
+<section class="view active" id="view-home">
+  <div class="hero">
+    <div>
+      <h1>Long videos in. Short clips out.</h1>
+      <p>Trim, caption and frame clips for TikTok, Reels and Shorts. AI clip detection and rendering need a backend, and show as not connected until you add one.</p>
+      <button class="btn primary" data-go="project">Start new project</button>
+    </div>
+    <div class="stage" aria-hidden="true">
+      <div class="card3d c1"><i></i></div><div class="card3d c2"><i></i></div><div class="card3d c3"><i></i></div>
+    </div>
+  </div>
+  <div class="grid3">
+    <div class="panel"><h3>Processing status</h3><p id="statusText">No video loaded.</p><span class="badge off" id="backendBadge">Backend not connected</span></div>
+    <div class="panel"><h3>Recent projects</h3><p class="empty" id="recent">No projects yet. Upload a video to begin.</p></div>
+    <div class="panel"><h3>Export history</h3><p class="empty">No exports yet. Rendering needs the backend.</p></div>
+  </div>
+</section>
+
+<!-- NEW PROJECT -->
+<section class="view" id="view-project">
+  <h2>New project</h2>
+  <div class="panel">
+    <h3>1. Add your video</h3>
+    <div class="tabs" role="tablist">
+      <button class="tab active" data-tab="upload" role="tab">Upload video</button>
+      <button class="tab" data-tab="yt" role="tab">YouTube URL</button>
+    </div>
+    <div id="tab-upload">
+      <label class="drop" id="drop">
+        <input type="file" id="file" accept="video/mp4,video/quicktime,video/webm,video/*" hidden>
+        <b>Tap to choose a video</b><small>MP4, MOV or WEBM (browser support varies)</small>
+      </label>
+      <div id="fileBox" hidden>
+        <video id="preview" controls playsinline></video>
+        <p id="fileInfo"></p>
+        <div class="row"><button class="btn" id="replaceBtn">Replace</button><button class="btn danger" id="removeBtn">Remove</button></div>
+      </div>
+    </div>
+    <div id="tab-yt" hidden>
+      <input class="input" id="ytUrl" type="url" inputmode="url" placeholder="https://youtu.be/… or youtube.com/watch?v=…" aria-label="YouTube URL">
+      <button class="btn primary" id="ytBtn">Check link</button>
+      <p id="ytMsg" role="status"></p>
+    </div>
+  </div>
+
+  <div class="panel"><h3>2. Output format</h3>
+    <div class="chips" id="ratios">
+      <button class="chip active" data-ratio="9/16"><span class="rp" style="aspect-ratio:9/16"></span>9:16 Portrait</button>
+      <button class="chip" data-ratio="1/1"><span class="rp" style="aspect-ratio:1/1"></span>1:1 Square</button>
+      <button class="chip" data-ratio="16/9"><span class="rp" style="aspect-ratio:16/9"></span>16:9 Landscape</button>
+    </div>
+  </div>
+
+  <div class="panel"><h3>3. AI clip settings <span class="badge off">Planned</span></h3>
+    <p class="muted">Saved as preferences. Clips are not generated until the backend is connected.</p>
+    <div class="fields">
+      <label>Clips<select id="clipCount"><option>1</option><option>3</option><option selected>5</option><option>10</option></select></label>
+      <label>Duration<select id="clipDur"><option>15</option><option selected>30</option><option>45</option><option>60</option></select></label>
+      <label>Category<select><option>Podcast</option><option>Tutorial</option><option>Gaming</option><option>Interview</option><option>Vlog</option></select></label>
+      <label>Highlights<select><option>Hooks</option><option>Scene changes</option><option>Emotional peaks</option></select></label>
+    </div>
+    <button class="btn primary" id="genBtn">Generate clips</button>
+  </div>
+
+  <div class="panel"><h3>4. Caption style</h3>
+    <div class="chips caps" id="styles"></div>
+  </div>
+</section>
+
+<!-- EDITOR -->
+<section class="view" id="view-editor">
+  <h2>Editor</h2>
+  <div class="panel empty-ed" id="edEmpty"><p class="empty">Add a video in New project to start editing.</p><button class="btn primary" data-go="project">Add video</button></div>
+  <div id="edBox" hidden>
+    <div class="frame-wrap"><div class="frame" id="frame"><video id="edVideo" playsinline></video><div class="cap" id="cap">Your caption</div></div></div>
+    <div class="panel">
+      <div class="row"><button class="btn primary" id="playSeg">Play clip</button><button class="btn" id="pauseBtn">Pause</button><span id="time" class="muted"></span></div>
+      <div class="timeline"><div class="sel" id="sel"></div></div>
+      <label>Start <span id="sv">0.0s</span><input type="range" id="start" min="0" max="0" step="0.1" value="0"></label>
+      <label>End <span id="ev">0.0s</span><input type="range" id="end" min="0" max="0" step="0.1" value="0"></label>
+      <label>Caption text<input class="input" id="capText" value="Your caption"></label>
+      <label>Caption position <input type="range" id="capPos" min="5" max="85" value="70"></label>
+    </div>
+  </div>
+</section>
+
+<!-- EXPORT -->
+<section class="view" id="view-export">
+  <h2>Export</h2>
+  <div class="panel">
+    <div class="fields">
+      <label>Format<select><option>MP4</option></select></label>
+      <label>Quality<select><option>720p</option><option selected>1080p</option></select></label>
+    </div>
+    <p class="muted" id="expSummary"></p>
+    <button class="btn primary" id="expBtn">Render clip</button>
+    <div class="bar"><i id="bar"></i></div>
+    <p id="expMsg" role="status">Not started.</p>
+    <button class="btn" id="dlBtn" disabled>Download</button>
+  </div>
+</section>
+
+<!-- SETTINGS / FEATURE STATUS -->
+<section class="view" id="view-settings">
+  <h2>Settings</h2>
+  <div class="panel"><h3>Backend</h3>
+    <p class="muted">Set <code>API_BASE</code> at the top of app.js to your server URL. Never put secret keys in frontend code.</p></div>
+  <div class="panel"><h3>Feature status</h3><ul class="status" id="features"></ul></div>
+</section>
+</main>
+</div>
+
+<dialog id="dlg"><p id="dlgText"></p><div class="row"><button class="btn" id="dlgNo">Cancel</button><button class="btn danger" id="dlgYes">Confirm</button></div></dialog>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+<script src="app.js"></script>
+</body>
+</html>
